@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jogo EEG</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="head-container">
+    <img id="head-image" src="./assets/frente.png" alt="Cabeça" />
+    <svg id="linha-medicao"></svg>
+    <div id="pontos-validacao" style="position: absolute; top: 0; left: 0; pointer-events: none; width: 100%; height: 100%; z-index: 5;"></div>
+    <div id="pontos-container"></div>
+    <div class="instrucao-container">
+      <div id="instrucao-medicao">Aperte no botão "Iniciar medição".</div>
+      <button id="button-medicao" onclick="ativarModoMedicao()" class="button-medicao">Iniciar Medição</button>
+      <p id="resultado-medicao"></p>
+    </div>
+    <div id="seta-troca-visao" class="seta-animada" style="display: none;">Trocar para trás ➡</div>
+  </div>
+
+  <div class="sidebar">
+    <button onclick="changeView('esquerda')"><img src="./assets/esquerda.png" alt="Vista esquerda" /></button>
+    <button onclick="changeView('atras')"><img src="./assets/atras.png" alt="Vista de trás" /></button>
+    <button onclick="changeView('cima')"><img src="./assets/cima.png" alt="Vista de cima" /></button>
+    <button onclick="changeView('direita')"><img src="./assets/direita.png" alt="Vista direita" /></button>
+    <button onclick="changeView('frente')"><img src="./assets/frente.png" alt="Vista frontal" /></button>
+  </div>
+
+  <div class="toolbox">
+    <p><strong></strong></p>
+    <div class="item eletrodo" draggable="true" data-id="Fp1">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Fp1" />
+      <span class="nome-eletrodo">Fp1</span>
+    </div> 
+    <div class="item eletrodo" draggable="true" data-id="Fp2">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Fp2" />
+      <span class="nome-eletrodo">Fp2</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="Ref">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Fp1" />
+      <span class="nome-eletrodo">Ref</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="Testa">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Fp1" />
+      <span class="nome-eletrodo">Testa</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="Fz">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Fp1" />
+      <span class="nome-eletrodo">Fz</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="Cz">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Cz" />
+      <span class="nome-eletrodo">Cz</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="Pz">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Pz" />
+      <span class="nome-eletrodo">Pz</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="Oz">
+      <img src="./assets/eletrodo.png" alt="Eletrodo Oz" />
+      <span class="nome-eletrodo">Oz</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="T3">
+      <img src="./assets/eletrodo.png" alt="Eletrodo T3" />
+      <span class="nome-eletrodo">T3</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="C3">
+      <img src="./assets/eletrodo.png" alt="Eletrodo C3" />
+      <span class="nome-eletrodo">C3</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="T4">
+      <img src="./assets/eletrodo.png" alt="Eletrodo T4" />
+      <span class="nome-eletrodo">T4</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="C4">
+      <img src="./assets/eletrodo.png" alt="Eletrodo C4" />
+      <span class="nome-eletrodo">C4</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="F8">
+      <img src="./assets/eletrodo.png" alt="Eletrodo F8" />
+      <span class="nome-eletrodo">F8</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="T6">
+      <img src="./assets/eletrodo.png" alt="Eletrodo T6" />
+      <span class="nome-eletrodo">T6</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="F7">
+      <img src="./assets/eletrodo.png" alt="Eletrodo F7" />
+      <span class="nome-eletrodo">F7</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="T5">
+      <img src="./assets/eletrodo.png" alt="Eletrodo T5" />
+      <span class="nome-eletrodo">T5</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="O2">
+      <img src="./assets/eletrodo.png" alt="Eletrodo O2" />
+      <span class="nome-eletrodo">O2</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="O1">
+      <img src="./assets/eletrodo.png" alt="Eletrodo O1" />
+      <span class="nome-eletrodo">O1</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="F4">
+      <img src="./assets/eletrodo.png" alt="Eletrodo F4" />
+      <span class="nome-eletrodo">F4</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="F3">
+      <img src="./assets/eletrodo.png" alt="Eletrodo F3" />
+      <span class="nome-eletrodo">F3</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="P4">
+      <img src="./assets/eletrodo.png" alt="Eletrodo P4" />
+      <span class="nome-eletrodo">P4</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="P3">
+      <img src="./assets/eletrodo.png" alt="Eletrodo P3" />
+      <span class="nome-eletrodo">P3</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="A1">
+      <img src="./assets/eletrodo.png" alt="Eletrodo A1" />
+      <span class="nome-eletrodo">A1</span>
+    </div>
+    <div class="item eletrodo" draggable="true" data-id="A2">
+      <img src="./assets/eletrodo.png" alt="Eletrodo A2" />
+      <span class="nome-eletrodo">A2</span>
+    </div>
+    <div id="pasta-eeg" class="item pasta">
+      <img src="./assets/pastaEEG.png" class="potePastaEGG" alt="Pasta EEG" />
+    </div>
+    <img id="gaze" src="./assets/gaze.png" alt="Gaze" draggable="true" />
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

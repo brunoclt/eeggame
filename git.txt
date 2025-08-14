@@ -1,0 +1,18 @@
+git remote add origin https://github.com/brunoclt/eeg 
+
+git branch /// VERIFICAR BRANCHS
+
+git init 
+
+git add . 
+
+git commit -m "commit"
+
+git push -u origin (branch) 
+
+(se der erro  /// git checkout -b FuncionalidadesPrincipais) 
+
+git status - Verifica se tem algo para comitar.
+
+git remote -v - Verifica qual URL está configurada. 
+.
