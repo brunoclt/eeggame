@@ -7,10 +7,12 @@
 
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(to bottom, #edf2f7, #cfd8dc);
+  background-repeat: no-repeat;
+  background-size: cover;       /* cobre toda a tela */
+  background-attachment: fixed; /* mantém fixo, sem blocos */
   color: #333;
   overflow-x: hidden;
-  overflow: hidden;
+  overflow-y: hidden; /* se quiser travar rolagem */
 }
 
 body.usando-gaze {
@@ -186,33 +188,111 @@ body.usando-gaze {
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* TOOLBOX */
-.toolbox {
-  position: absolute;
-  bottom: 10px;
+.dropdown-fixed-toolbox {
+  position: fixed;
+  top: 65%;
   left: 10px;
-  background: #ffffffcc;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 8px;
+  border-radius: 20%;
+  z-index: 1000;
+  display: inline-flex; 
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  max-width: 82%;
+}
+
+.dropdown-fixed-toolbox > * {
+  flex: 0 0 auto; 
+}
+
+/* Menu */
+.toolbox {
+  position: relative;
+  top: 100%;
+  left: 0;
+  max-width: 40%;
   width: auto;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
-  
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* ← duas colunas iguais */
-  gap: 6px;
-  justify-items: center;
+  max-height: 200px;
+  padding: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: white;
+  border: 1px solid #90caf9;
+  border-radius: 7%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: all 0.25s ease;
+  z-index: 1001;
+}
+
+/* Dica acima do menu */
+.scroll-tip {
+  position: absolute;
+  top: 85%;
+  left: 12%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
+  background: rgba(0,0,0,0.75);
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Itens do menu */
+.toolbox .item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  cursor: grab;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.toolbox .item img {
+  width: 28px;
+  height: 28px;
+  margin-right: 6px;
+}
+
+
+.toolbox .item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  cursor: grab;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.toolbox .item:hover {
+  background-color: #f0f0f0;
+}
+
+.toolbox .item img {
+  width: 28px;
+  height: 28px;
+  margin-right: 6px;
 }
 
 .toolbox p {
-  grid-column: span 2; /* ← para o título ocupar as duas colunas */
+  grid-column: span 2;
   font-size: 13px;
   font-weight: 600;
   color: #333;
   margin-bottom: 4px;
   text-align: center;
 }
-
 
 .toolbox .item.eletrodo {
   background: linear-gradient(to bottom, #ffffff, #e3f2fd);
@@ -234,7 +314,6 @@ body.usando-gaze {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-
 
 .toolbox .item.eletrodo img {
   width: 70%;
@@ -268,13 +347,14 @@ body.usando-gaze {
   }
 }
 
+
 /* PASTA EEG */
 .item.pasta {
   background: linear-gradient(to bottom, #ffffff, #e3f2fd);
   border: 1px solid #90caf9;
   border-radius: 12px;
-  width: 60px;
-  height: 60px;
+  width: 70px; 
+  height: 70px; 
   padding: 5px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   cursor: grab;
@@ -290,7 +370,7 @@ body.usando-gaze {
 }
 
 .potePastaEGG {
-  width: 135%;
+  width: 165%;
   height: auto;
   object-fit: contain;
 }
@@ -302,11 +382,23 @@ body.usando-gaze {
 
 /* GAZE */
 #gaze {
-  width: 64px;
-  height: auto;
-  margin-top: 12px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  background: linear-gradient(to bottom, #ffffff, #e3f2fd);
+  border: 1px solid #90caf9;
+  border-radius: 12px;
+  width: 70px; 
+  height: 70px;
+  padding: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: grab;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s;
+}
+
+#gaze:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 #gaze.ativo {
@@ -314,27 +406,6 @@ body.usando-gaze {
   border-radius: 6px;
 }
 
-#mouse-gaze {
-  transition: transform 0.05s linear;
-}
-
-.toolbox #gaze {
-  background: linear-gradient(to bottom, #ffffff, #e3f2fd);
-  border: 1px solid #90caf9;
-  border-radius: 12px;
-  padding: 6px;
-  width: 60px;
-  height: 60px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s;
-  object-fit: contain;
-}
-
-.toolbox #gaze:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
 
 .ponto-medicao {
   width: 16px;
@@ -447,35 +518,12 @@ body.usando-gaze {
   z-index: 5;
 }
 
-    /* RESPONSIVO */
-@media (max-width: 768px) {
-  .head-container {
-    max-width: 90%;
-  }
-
-  .toolbox {
-    width: 120px;
-    padding: 8px;
-  }
-
-  .ponto::after {
-    font-size: 10px;
-    padding: 1px 3px;
-  }
-
-  .sidebar button {
-    width: 50px;
-    height: 50px;
-  }
-}
-
-.seta-animada {
+#seta-troca-visao {
   position: absolute;
-  display: flex;
-  top: 37%;
-  right: -80%;
+  display: none;
   font-size: 20px;
   color: red;
+  cursor: pointer;
   animation: piscar 1s infinite;
   background: rgba(255, 255, 255, 0.7);
   padding: 10px;
@@ -512,4 +560,45 @@ body.usando-gaze {
   50% {
     box-shadow: 0 0 25px 10px rgba(255, 0, 0, 0.2);
   }
+}
+
+.itens-funcionais {
+  position: fixed;
+  bottom: 250px;
+  left: 20px;
+  display: flex;
+  gap: 15px;
+  z-index: 999;
+  border: 2px solid red;
+}
+
+#gif-quadro {
+  position: fixed;
+  top: 10px;
+  left: 40px;
+  width: 500px;
+  height: 250px;
+  background: #fff;
+  border: 3px solid #444;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+#gif-quadro img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 1600px) {
+    .itens-funcionais {
+        bottom: 300px;
+        left: 20px;
+        border: 2px solid rgb(0, 89, 255);
+    }
 }

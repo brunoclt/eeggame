@@ -24,6 +24,43 @@ const instrucaoMedicao = document.getElementById('instrucao-medicao');
 const resultadoMedicao = document.getElementById('resultado-medicao');
 const setaTroca = document.getElementById('seta-troca-visao');
 
+function mudarGif(novoGif) {
+  const gif = document.getElementById("gif-atual");
+  gif.src = `./assets/${novoGif}`;
+}
+
+function mostrarSetaAoLadoDoBotao(botao, texto, direcao = 'right', offsetY = -10) {
+  if (!botao) return;
+
+  setaTroca.textContent = texto;
+  setaTroca.style.display = 'flex';
+
+  const rect = botao.getBoundingClientRect();
+
+  let top = rect.top + window.scrollY + rect.height / 2 - setaTroca.offsetHeight / 2 + offsetY;
+
+  let left = rect.right + window.scrollX + 10;
+  if (direcao === 'left') {
+    left = rect.left + window.scrollX - setaTroca.offsetWidth - 600;
+  }
+
+  setaTroca.style.top = `${top}px`;
+  setaTroca.style.left = `${left}px`;
+  setaTroca.style.width = `200px`;
+
+  setaTroca.onclick = () => botao.click();
+  setaTroca._botaoAlvo = botao;
+}
+
+
+
+// Atualiza ao redimensionar a tela
+window.addEventListener('resize', () => {
+  if (setaTroca.style.display !== 'none' && setaTroca._botaoAlvo) {
+    mostrarSetaAoLadoDoBotao(setaTroca._botaoAlvo, setaTroca.textContent);
+  }
+});
+
 let modoMedicaoAtivo = false;
 let pontosMedidos = {
   frente: [],
@@ -76,8 +113,8 @@ const coordenadasPorVisao = {
     F7: { x: 315, y: 170 },
     F4: { x: 83, y: 95 },
     F3: { x: 270, y: 95 },
-    A1: { x: 30, y: 320 },
-    A2: { x: 320, y: 320 },
+    A1: { x: 320, y: 320 },
+    A2: { x: 30, y: 320 },
   },
   cima: {
     Cz: { x: 175, y: 35 },
@@ -96,13 +133,15 @@ const coordenadasPorVisao = {
     F3: { x: 290, y: 150 }, 
     Fp2: { x: 115, y: 230 },
     Fp1: { x: 235, y: 230 },
+    A1: { x: 320, y: 315 },
+    A2: { x: 30, y: 315 },
   },
   atras: {
     Cz: { x: 185, y: 0 },
     Pz: { x: 185, y: 55 }, 
     Oz: { x: 185, y: 170 },
-    O2: { x: 265, y: 170 },
-    O1: { x: 100, y: 170 },
+    O2: { x: 100, y: 170 },
+    O1: { x: 265, y: 170 },
     P3: { x: 265, y: 55 }, 
     P4: { x: 100, y: 55 }, 
   },
@@ -116,6 +155,7 @@ const coordenadasPorVisao = {
     Fp2: { x: 265, y: 130 },
     F4: { x: 205, y: 70, },
     P4: { x: 35, y: 60 },
+    A2: { x: 125, y: 290 },
   },
   esquerda: {
     T3: { x: 245, y: 145},
@@ -126,7 +166,8 @@ const coordenadasPorVisao = {
     F3: { x: 160, y: 70},
     T5: { x: 330, y: 145},
     P3: { x: 330, y: 70},
-    Fp1: { x: 80, y: 135 }
+    Fp1: { x: 80, y: 135 },
+    A1: { x: 230, y: 280 },
   },
 };
 
@@ -157,7 +198,6 @@ const pontosEsperados = {
   ],
 
 };
-
 
 function mostrarPontoAtual() {
   const container = document.getElementById('pontos-validacao');
@@ -190,11 +230,12 @@ function ativarModoMedicao() {
   pontosMedidos = { frente: [], atras: [] };
   instrucaoMedicao.textContent = 'Clique no primeiro ponto (frente)';
   resultadoMedicao.textContent = '';
-  setaTroca.style.display = 'none';
   linhaMedicao.innerHTML = '';
   indiceAtual = 0;
+
   mostrarPontoAtual();
 }
+
 
 function ativarMedicaoLateral() {
   modoMedicaoAtivo = true;
@@ -254,12 +295,14 @@ headImage.addEventListener('click', (e) => {
   if (visaoAtual === 'frente' && pontosMedidos.frente.length === 2) {
     desenharLinha(pontosMedidos.frente[0], pontosMedidos.frente[1]);
     instrucaoMedicao.textContent = 'Troque para a visão de trás e clique no ponto final';
-    setaTroca.style.display = 'block';
+    setaTroca.style.display = 'flex';
     medicaoTravada = true;
     indiceAtual = 0;
 
     const botaoAtras = document.querySelector('button[onclick="changeView(\'atras\')"]');
     if (botaoAtras) botaoAtras.classList.add('piscando-vermelho');
+    mostrarSetaAoLadoDoBotao(botaoAtras, 'Trocar para trás ➡', 'left', -15);
+    console.log('Seta posicionada em:', setaTroca.style.top, setaTroca.style.left);
 
     return;
   }
@@ -271,8 +314,10 @@ headImage.addEventListener('click', (e) => {
     modoMedicaoAtivo = false;
     medicaoTravada = true;
 
-    setaTroca.style.display = 'block';
-    setaTroca.style.top = '77.7%';
+    setaTroca.style.display = 'flex';
+    setaTroca.style.top = '82.5%';
+    setaTroca.style.right = '-80%';
+    setaTroca.style.width = '45%';
     setaTroca.textContent = 'Trocar para frente ➡';
 
     const botaoFrente = document.querySelector('button[onclick="changeView(\'frente\')"]');
@@ -472,16 +517,14 @@ function desenharTodasLinhas() {
 
     // Esquerda
     else if (visaoAtual === 'esquerda') {
-      // --- Sequência superior ---
+
       if (estado.T3.colocado && !estado.C3.colocado && !estado.F8.colocado) {
-        // Só desenha T4 → C4 se F8 ainda não foi colocado
         desenharLinha(coords.T3, coords.C3, 'blue');
       } 
       else if (estado.C3.colocado && !linhaC3CzFinalizada) {
         desenharLinha(coords.C3, coords.Cz, 'blue');
       }
       else if (estado.T3.colocado && !estado.T5.colocado && estado.F7.colocado) {
-        // Só desenha T4 → T6 se viemos da sequência inferior
         desenharLinha(coords.T3, coords.T5, 'blue');
       }
       else if (estado.T5.colocado && !estado.O1.colocado) {
@@ -491,20 +534,18 @@ function desenharTodasLinhas() {
 
     // Direita
     else if (visaoAtual === 'direita') {
-      // --- Sequência lateral inferior ---
+
       if (estado.F8.colocado && !estado.T4.colocado) {
         desenharLinha(coords.F8, coords.T4, 'blue');
       } 
       else if (estado.T4.colocado && !estado.T6.colocado && estado.F8.colocado) {
-        // Só desenha T4 → T6 se viemos da sequência inferior
         desenharLinha(coords.T4, coords.T6, 'blue');
       }
       else if (estado.T6.colocado && !estado.O2.colocado) {
         desenharLinha(coords.T6, coords.O2, 'blue');
       }
-      // --- Sequência superior ---
+
       else if (estado.T4.colocado && !estado.C4.colocado && !estado.F8.colocado) {
-        // Só desenha T4 → C4 se F8 ainda não foi colocado
         desenharLinha(coords.T4, coords.C4, 'blue');
       } 
       else if (estado.C4.colocado && !estado.Cz.colocado) {
@@ -514,16 +555,13 @@ function desenharTodasLinhas() {
   }
 }
 
-
-
-
 let mouseGaze = document.createElement('img');
 mouseGaze.src = './assets/gaze.png';
 mouseGaze.id = 'mouse-gaze';
 Object.assign(mouseGaze.style, {
   position: 'fixed',
-  width: '60px',
-  height: '60px',
+  width: '80px',
+  height: '80px',
   pointerEvents: 'none',
   zIndex: '1000',
   display: 'none'
@@ -901,10 +939,8 @@ function iniciarSequenciaT3() {
   sequenciaLateralFinalizada = false;
   estadoEletrodos.Cz.visivelTemporariamente = false;
 
-  // Garante que o ponto T3 seja mostrado
   estadoEletrodos.T3.visivelTemporariamente = true;
 
-  // Espera até a visão estar correta antes de renderizar os pontos
   const aguardarEsquerda = setInterval(() => {
     if (visaoAtual === 'esquerda') {
       clearInterval(aguardarEsquerda);
@@ -915,7 +951,6 @@ function iniciarSequenciaT3() {
     }
   }, 300);
 
-  // Sequência em cadeia, igual à do topo
   const intervaloT3 = setInterval(() => {
     if (estadoEletrodos.T3.colocado) {
       clearInterval(intervaloT3);
@@ -937,11 +972,9 @@ function iniciarSequenciaT3() {
 
   instrucao.textContent = 'Após o posicionamento C3 verifique se ele está na mesma linha do eletrodo Cz.';
 
-  // NOVO: Destaca botão da visão direita
   const botaoDireita = document.querySelector('button[onclick="changeView(\'direita\')"]');
   if (botaoDireita) botaoDireita.classList.add('piscando-vermelho');
 
-  // Aguarda o jogador trocar para a direita
   const esperarDireita = setInterval(() => {
     if (visaoAtual === 'direita') {
       clearInterval(esperarDireita);
@@ -998,7 +1031,6 @@ function iniciarSequenciaT4() {
           const botaoFrente = document.querySelector('button[onclick="changeView(\'frente\')"]');
           if (botaoFrente) botaoFrente.classList.add('piscando-vermelho');
 
-          // Aguarda o jogador trocar para a frente
           const esperarFrente = setInterval(() => {
             if (visaoAtual === 'frente') {
               clearInterval(esperarFrente);
@@ -1043,12 +1075,10 @@ function iniciarSequenciaFp2() {
       renderizarPontos('frente');
       desenharTodasLinhas();
 
-      // 2️⃣ F8
       const intervaloF8 = setInterval(() => {
         if (estadoEletrodos.F8.colocado) {
           clearInterval(intervaloF8);
 
-          // Pede troca para lateral direita
           instrucao.textContent = 'Troque para a visão DIREITA para continuar.';
           const botaoDireita = document.querySelector('button[onclick="changeView(\'direita\')"]');
           if (botaoDireita) botaoDireita.classList.add('piscando-vermelho');
@@ -1057,18 +1087,15 @@ function iniciarSequenciaFp2() {
             if (visaoAtual === 'direita') {
               clearInterval(aguardarDireita);
 
-              // Mostra T6 (T4 já posicionado)
               instrucao.textContent = 'Coloque o eletrodo T6 (entre T4 e O2).';
               estadoEletrodos.T6.visivelTemporariamente = true;
               renderizarPontos('direita');
               desenharTodasLinhas();
 
-              // 3️⃣ T6
               const intervaloT6 = setInterval(() => {
                 if (estadoEletrodos.T6.colocado) {
                   clearInterval(intervaloT6);
 
-                  // Troca para trás
                   instrucao.textContent = 'Troque para a visão TRÁS para continuar.';
                   const botaoAtras = document.querySelector('button[onclick="changeView(\'atras\')"]');
                   if (botaoAtras) botaoAtras.classList.add('piscando-vermelho');
@@ -1077,13 +1104,11 @@ function iniciarSequenciaFp2() {
                     if (visaoAtual === 'atras') {
                       clearInterval(aguardarAtras);
 
-                      // Mostra O2
                       instrucao.textContent = 'Coloque o eletrodo O2.';
                       estadoEletrodos.O2.visivelTemporariamente = true;
                       renderizarPontos('atras');
                       desenharTodasLinhas();
 
-                      // 4️⃣ O2
                       const intervaloO2 = setInterval(() => {
                         if (estadoEletrodos.O2.colocado) {
                           clearInterval(intervaloO2);
@@ -1132,7 +1157,6 @@ function iniciarSequenciaFp1() {
     }
   }, 300);
 
-  // 1️⃣ Fp1
   const intervaloFp1 = setInterval(() => {
     if (estadoEletrodos.Fp1.colocado) {
       clearInterval(intervaloFp1);
@@ -1143,12 +1167,10 @@ function iniciarSequenciaFp1() {
       renderizarPontos('frente');
       desenharTodasLinhas();
 
-      // 2️⃣ F7
       const intervaloF7 = setInterval(() => {
         if (estadoEletrodos.F7.colocado) {
           clearInterval(intervaloF7);
 
-          // Pede troca para lateral esquerda
           instrucao.textContent = 'Troque para a visão ESQUERDA para continuar.';
           const botaoEsquerda = document.querySelector('button[onclick="changeView(\'esquerda\')"]');
           if (botaoEsquerda) botaoEsquerda.classList.add('piscando-vermelho');
@@ -1157,18 +1179,15 @@ function iniciarSequenciaFp1() {
             if (visaoAtual === 'esquerda') {
               clearInterval(aguardarEsquerda);
 
-              // Mostra T5 (T3 já posicionado)
               instrucao.textContent = 'Coloque o eletrodo T5.';
               estadoEletrodos.T5.visivelTemporariamente = true;
               renderizarPontos('esquerda');
               desenharTodasLinhas();
 
-              // 3️⃣ T5
               const intervaloT5 = setInterval(() => {
                 if (estadoEletrodos.T5.colocado) {
                   clearInterval(intervaloT5);
 
-                  // Troca para trás
                   instrucao.textContent = 'Troque para a visão TRÁS para continuar.';
                   const botaoAtras = document.querySelector('button[onclick="changeView(\'atras\')"]');
                   if (botaoAtras) botaoAtras.classList.add('piscando-vermelho');
@@ -1178,13 +1197,11 @@ function iniciarSequenciaFp1() {
                       clearInterval(aguardarAtras);
                       if (botaoAtras) botaoAtras.classList.remove('piscando-vermelho');
 
-                      // Mostra O1
                       instrucao.textContent = 'Coloque o eletrodo O1.';
                       estadoEletrodos.O1.visivelTemporariamente = true;
                       renderizarPontos('atras');
                       desenharTodasLinhas();
 
-                      // 4️⃣ O1
                       const intervaloO1 = setInterval(() => {
                         if (estadoEletrodos.O1.colocado) {
                           clearInterval(intervaloO1);
@@ -1235,7 +1252,6 @@ function iniciarSequenciaF4() {
     }
   }, 300);
 
-  // 1️⃣ F4
   const intervaloF4 = setInterval(() => {
     if (estadoEletrodos.F4.colocado) {
       clearInterval(intervaloF4);
@@ -1246,12 +1262,10 @@ function iniciarSequenciaF4() {
       renderizarPontos('frente');
       desenharTodasLinhas();
 
-      // 2️⃣ C4
       const intervaloC4 = setInterval(() => {
         if (estadoEletrodos.C4.colocado) {
           clearInterval(intervaloC4);
 
-          // Pede troca para lateral direita
           instrucao.textContent = 'Troque para a visão ATRAS para continuar.';
           const botaoAtras = document.querySelector('button[onclick="changeView(\'atras\')"]');
           if (botaoAtras) botaoAtras.classList.add('piscando-vermelho');
@@ -1260,14 +1274,12 @@ function iniciarSequenciaF4() {
             if (visaoAtual === 'atras') {
               clearInterval(aguardarAtras);
 
-              // Mostra P4
               instrucao.textContent = 'Coloque o eletrodo P4.';
               estadoEletrodos.P4.visivelTemporariamente = true;
               renderizarPontos('atras');
               desenharTodasLinhas();
               if (botaoAtras) botaoAtras.classList.remove('piscando-vermelho');
 
-              // 3️⃣ P4
               const intervaloP4 = setInterval(() => {
                 if (estadoEletrodos.P4.colocado) {
                   clearInterval(intervaloP4);
@@ -1314,7 +1326,6 @@ function iniciarSequenciaF3() {
     }
   }, 300);
 
-  // 1️⃣ F4
   const intervaloF3 = setInterval(() => {
     if (estadoEletrodos.F3.colocado) {
       clearInterval(intervaloF3);
@@ -1325,12 +1336,10 @@ function iniciarSequenciaF3() {
       renderizarPontos('frente');
       desenharTodasLinhas();
 
-      // 2️⃣ C4
       const intervaloC3 = setInterval(() => {
         if (estadoEletrodos.C3.colocado) {
           clearInterval(intervaloC3);
 
-          // Pede troca para lateral direita
           instrucao.textContent = 'Troque para a visão ATRAS para continuar.';
           const botaoAtras = document.querySelector('button[onclick="changeView(\'atras\')"]');
           if (botaoAtras) botaoAtras.classList.add('piscando-vermelho');
@@ -1339,14 +1348,12 @@ function iniciarSequenciaF3() {
             if (visaoAtual === 'atras') {
               clearInterval(aguardarAtras);
 
-              // Mostra P3
               instrucao.textContent = 'Coloque o eletrodo P3.';
               estadoEletrodos.P3.visivelTemporariamente = true;
               renderizarPontos('atras');
               desenharTodasLinhas();
               if (botaoAtras) botaoAtras.classList.remove('piscando-vermelho');
 
-              // 3️⃣ P3
               const intervaloP3 = setInterval(() => {
                 if (estadoEletrodos.P3.colocado) {
                   clearInterval(intervaloP3);
@@ -1393,7 +1400,6 @@ function iniciarSequenciaA1() {
     }
   }, 300);
 
-  // 1️⃣ F4
   const intervaloA1 = setInterval(() => {
     if (estadoEletrodos.A1.colocado) {
       clearInterval(intervaloA1);
@@ -1404,7 +1410,6 @@ function iniciarSequenciaA1() {
       renderizarPontos('frente');
       desenharTodasLinhas();
 
-      // 2️⃣ C4
       const intervaloA2 = setInterval(() => {
         if (estadoEletrodos.A2.colocado) {
           clearInterval(intervaloA2);

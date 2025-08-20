@@ -1,0 +1,26 @@
+-- Verificar Media Query da Tela -- 
+
+No console flutuante = CTRL + SHIFT + M
+
+console.log(document.documentElement.clientWidth);
+
+-------------------------------------
+
+border: 2px solid red; = Verificar tamanhos, proporções e etc. 
+
+-------------------------------------
+
+function ativarModoMedicao() {
+  mudarGif("medicao.gif");
+  // resto da lógica já existente
+}
+
+-------------------------------------
+
+function eletrodoPosicionado(id) {
+  if (id === "Ref") {
+    mudarGif("colocando-ref.gif");
+  } else if (id === "Fz") {
+    mudarGif("colocando-fz.gif");
+  }
+}
